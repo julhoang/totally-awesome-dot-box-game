@@ -3,6 +3,7 @@ const maxCells = 3; // 2 x 2 grid
 var currentPlayer = 1;
 const gameState = [];
 const boxFilled = []; // keep track of which boxes were filled
+const boxNotFilled = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 const score1 = 0;
 const score2 = 0;
 
@@ -15,9 +16,13 @@ const score2 = 0;
 	]
 */
 
+initializeGameState();
+createGameBoard();
+
 while (score1 + score2 < 9) {
-  initializeGameState();
-  createGameBoard();
+  if (currentPlayer == 2) {
+    randomizedMove();
+  }
 }
 
 // FUNCTIONS
@@ -88,6 +93,8 @@ function addOnClick(element, className, id) {
       if (Object.keys(gameState[id].sides).length == 4) {
         gameState[id].filled = currentPlayer;
         boxFilled.push(id);
+        boxNotFilled.pop(id);
+
         currentPlayer == 1 ? score1++ : score2;
         document.getElementById(id).style.backgroundColor = color;
       }
@@ -99,4 +106,22 @@ function initializeGameState() {
   for (var i = 1; i <= maxCells * maxCells; i++) {
     gameState.push({ box: i, sides: {}, filled: 0 });
   }
+}
+
+function randomizedMove() {
+  const randomIndex = Math.floor(Math.random() * boxNotFilled.length);
+  const moves = possibleMoves(gameState[boxNotFilled[randomIndex]]);
+
+  const pickedMove = Math.floor(Math.random() * moves.length);
+  document.getElementById(boxNotFilled[randomIndex]).click();
+}
+
+function possibleMoves(box) {
+  moves = new Array();
+  for (let i = 0; i < Object.keys(gameState[id].sides).length; i++) {
+    if (box.sides[i] == 0) {
+      moves.push(i);
+    }
+  }
+  return moves;
 }
