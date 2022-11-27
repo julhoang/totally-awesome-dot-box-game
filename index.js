@@ -1,6 +1,24 @@
 // FUNCTION CALLING
-const boxes = 4;
-createGameBoard();
+const maxCells = 3; // 2 x 2 grid
+var currentPlayer = 1;
+const gameState = [];
+const boxFilled = []; // keep track of which boxes were filled
+const score1 = 0;
+const score2 = 0;
+
+/* 	Sample:
+	gameState = [
+		{box: 1, sides: {left: 1}, filled: true}
+		{box: 2, sides: {}, filled: false}
+		{box: 3, sides: {}, filled: false}
+		{box: 4, sides: {left: 1}, filled: false}}
+	]
+*/
+
+while (score1 + score2 < 9) {
+  initializeGameState();
+  createGameBoard();
+}
 
 // FUNCTIONS
 function createGameBoard() {
@@ -12,10 +30,10 @@ function createGameBoard() {
 
   var cell_counter = 1;
 
-  for (var r = 1; r <= boxes / 2; r++) {
+  for (var r = 1; r <= maxCells; r++) {
     const row = document.createElement("tr");
 
-    for (var c = 1; c <= boxes / 2; c++) {
+    for (var c = 1; c <= maxCells; c++) {
       const td = document.createElement("td");
       var cell = createCell(cell_counter);
       cell_counter++;
@@ -58,9 +76,27 @@ function createCell(cell_counter) {
 }
 
 function addOnClick(element, className, id) {
-  element.addEventListener("click", () => {
-    console.log(className + "-" + id);
+  element.addEventListener("click", function (event) {
+    // only update gameState if edge is not already clicked
+    if (gameState[id].sides[className] != 1) {
+      currentPlayer = currentPlayer == 1 ? 2 : 1;
+      gameState[id].sides[className] = 1; // add side to gameState
+
+      color = currentPlayer == 1 ? "red" : "blue"; // toggle color
+      element.style.setProperty("background-color", color);
+
+      if (Object.keys(gameState[id].sides).length == 4) {
+        gameState[id].filled = currentPlayer;
+        boxFilled.push(id);
+        currentPlayer == 1 ? score1++ : score2;
+        document.getElementById(id).style.backgroundColor = color;
+      }
+    }
   });
 }
 
-function checkList() {}
+function initializeGameState() {
+  for (var i = 1; i <= maxCells * maxCells; i++) {
+    gameState.push({ box: i, sides: {}, filled: 0 });
+  }
+}

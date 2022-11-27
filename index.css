@@ -1,10 +1,5 @@
-.horizontal {
-  border: 5px solid red;
-  width: 100px;
-}
-
 .left {
-  background-color: yellow;
+  border: 1px solid;
   width: 10px;
   height: 100px;
   position: relative;
@@ -12,7 +7,7 @@
 }
 
 .right {
-  background-color: red;
+  border: 1px solid;
   width: 10px;
   height: 100px;
   position: absolute;
@@ -21,7 +16,7 @@
 }
 
 .down {
-  background-color: green;
+  border: 1px solid;
   width: 100px;
   height: 10px;
   position: relative;
@@ -29,7 +24,7 @@
 }
 
 .up {
-  background-color: blue;
+  border: 1px solid;
   width: 100px;
   height: 10px;
   position: relative;
@@ -37,7 +32,7 @@
 }
 
 .cell {
-  border: 1px solid black;
+  /* border: 1px solid black; */
   position: relative;
   margin: -2px;
 }
