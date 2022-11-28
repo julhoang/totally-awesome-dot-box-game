@@ -45,11 +45,13 @@ function createGameBoard() {
   }
 
   container.appendChild(table);
+
+  formatTable();
 }
 
 function formatTable() {
-  for (var i = 0; i < maxCells * maxCells - maxCells; i++) {
-    document.getElementById("");
+  for (var i = 1; i <= maxCells * maxCells - maxCells; i++) {
+    document.getElementById(i).getElementsByClassName("down")[0].style.display = "None";
   }
 }
 
@@ -283,6 +285,9 @@ function checkedFilled(id, color) {
     boxFilled.push(id);
     boxNotFilled.pop(id);
     currentPlayer == 1 ? score1++ : score2++;
+    document.getElementById("score1").innerHTML = score1;
+    document.getElementById("score2").innerHTML = score2;
+
     document.getElementById(id).style.backgroundColor = color;
   }
 
