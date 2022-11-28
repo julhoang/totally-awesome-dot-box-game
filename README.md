@@ -1,2 +1,3 @@
 # totally-awesome-dot-box-game
-Game for UVECS
+A smart AI vs Player  dots and boxes game to meet the requirements set forth by the UVic Engineering Competition.
+
