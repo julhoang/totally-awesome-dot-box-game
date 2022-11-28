@@ -5,7 +5,7 @@ var currentPlayer = 1;
 const gameState = [];
 const boxFilled = []; // keep track of which boxes were filled
 const boxNotFilled = Array.from({ length: maxCells * maxCells }, (_, i) => i + 1);
-
+// console.log(boxNotFilled);
 var score1 = 0;
 var score2 = 0;
 
@@ -100,17 +100,22 @@ function createCell(cell_counter) {
 
 function bestMove(pos) {
   side = possibleMoves(pos)[0];
+  if(side == undefined){
+    side = 0;
+  }
   console.log("check size from bestMove " + side);
   if (side != undefined) {
     document.getElementById(pos).getElementsByClassName(side)[0].click();
   }
 
   // clicked and won so called computerMove
-  ComputerMove();
+  // ComputerMove() ;
 }
 
 function randomMove(box_num) {
-  side = possibleMoves(box_num)[0];
+  temp = possibleMoves(box_num);
+  side = temp[Math.floor(Math.random() * temp.length)];
+  // console.log(side)
   document.getElementById(box_num).getElementsByClassName(side)[0].click();
 }
 
@@ -163,7 +168,7 @@ function getAttached(curr_box) {
   return ret_list;
 }
 
-//make computer move after
+//make Ruter move after
 function ComputerMove() {
   console.log("player's move registered, about to make computer move");
 
@@ -171,42 +176,46 @@ function ComputerMove() {
     if (gameState[i].filled == 3) {
       console.log("there were 3 lines available, about to make bestMove");
       bestMove(i); //called when there is a winning line available
+      checkedFilled(i);
     }
   }
-
+  // checkedFilled()
   for (let j = 1; j <= maxCells * maxCells; j++) {
     //j is the curr box
-    if (gameState[j].filled == 1) {
-      console.log("count was 1, making random move in this box");
-      //check for attached boxes, if any of them are 2, continue
-      was_two = 000; //flag to keep track of if neighbours have 2
-      attached = getAttached(j);
+    // if (gameState[j].filled == 1) {
+    //   console.log("count was 1, making random move in this box");
+    //   //check for attached boxes, if any of them are 2, continue
+    //   was_two = 000; //flag to keep track of if neighbours have 2
+    //   attached = getAttached(j);
 
-      // check all neighbors
-      for (i in attached) {
-        if (i != 0) {
-          if (gameState[i].filled == 2) {
-            was_two = 111;
-            break;
-          }
-        } else {
-          continue;
-        }
-      }
+    //   // check all neighbors
+    //   for (i in attached) {
+    //     if (i != 0) {
+    //       if (gameState[i].filled == 2) {
+    //         was_two = 111;
+    //         break;
+    //       }
+    //     } else {
+    //       continue;
+    //     }
+    //   }
 
-      if (was_two == 111) {
-        continue;
-      } else {
-        randomMove(j);
-        return;
-      }
-    } else {
+    //   if (was_two == 111) {
+    //     continue;
+    //   } else {
+    //     randomMove(j);
+    //     return;
+    //   }
+    // } else {
       //********** CALL RANDOM MOVE WITH A MATH.RANDOM AVAILABLE SPOT IN BOX NOT FILLED  **************
+      
       console.log("calling random");
-      const randomIndex = Math.floor(Math.random() * boxNotFilled.length) + 1;
-      randomMove(randomIndex);
+      const randomIndex = Math.floor(Math.random() * boxNotFilled.length+1);
+      checkedFilled(boxNotFilled[randomIndex]);
+      console.log("random index " + boxNotFilled[randomIndex]);
+      randomMove(boxNotFilled[randomIndex]);
       return;
-    }
+    // }
   }
 }
 
@@ -218,22 +227,31 @@ function addOnClick(element, side, id) {
 
       gameState[id].sides[side] = 1; // update the side that was actually clicked
       gameState[id].filled++;
-
-      const filled = checkedFilled(id, color);
       updateSurrounding(id, side, color);
+      const filled = checkedFilled(id, color);
+      // updateSurrounding(id, side, color);
 
-      if (filled != 4) {
-        currentPlayer = currentPlayer == 1 ? "2" : "1";
+      // console.log(filled);
+      if (filled != 1) {
+        // console.log("In Here for some reason");     
+        if(currentPlayer == 1){currentPlayer = currentPlayer == 1 ? "2" : "1";
+        color = currentPlayer == 1 ? "red" : "blue"; }
+
         color = currentPlayer == 1 ? "red" : "blue"; // toggle color
         setTimeout(function () {
           document.getElementById("currentPlayer").innerHTML = currentPlayer;
 
           if (currentPlayer == 2) {
             ComputerMove();
+            currentPlayer = currentPlayer == 1 ? "2" : "1";
+            color = currentPlayer == 1 ? "red" : "blue";
+            // currentPlayer = currentPlayer == 1 ? "2" : "1";
+            // color = "red";
           }
-        }, 1000);
+        }, 0);
       } else {
         element.style.setProperty("background-color", color);
+        
       }
     }
   });
@@ -312,13 +330,13 @@ function checkedFilled(id, color) {
 function possibleMoves(pos) {
   moves = new Array();
   console.log("pos: " + pos);
-  console.log(JSON.stringify(gameState[pos].sides));
-  for (let i = 0; i < 3; i++) {
+   console.log(JSON.stringify(gameState[pos].sides));
+  for (let i = 0; i < 4; i++) {
     if (gameState[pos].sides[i] == 0) {
       moves.push(i);
     }
   }
-
+  console.log(JSON.stringify(moves));
   if (moves == undefined) {
     moves = [0, 0, 0, 0];
   }
