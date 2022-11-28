@@ -1,5 +1,6 @@
 // FUNCTION CALLING
 const maxCells = 4; // 2 x 2 grid
+const GridSize = 4;
 var currentPlayer = 1;
 const gameState = [];
 const boxFilled = []; // keep track of which boxes were filled
@@ -9,22 +10,20 @@ var score1 = 0;
 var score2 = 0;
 
 var move = 1; // odd = human, even = AI
+color = "red";
 
-/* 	Sample:
-	gameState = [
-		{box: 1, sides: {left: 1}, filled: 1}
-		{box: 2, sides: {}, filled: false}
-		{box: 3, sides: {}, filled: false}
-		{box: 4, sides: {left: 1}, filled: 1}}
-	]
-*/
+const Move = new Object();
+Move.player = "player";
+Move.boxNum1 = -1;
+Move.move1 = -1; //default -1, change to 0,1,2 or 3
+Move.boxNum2 = -1;
+Move.move2 = -1; //default -1, change to 0,1,2 or 3
 
 initializeGameState();
 createGameBoard();
 
 // FUNCTIONS
 function createGameBoard() {
-  console.log("creating game board");
   const container = document.getElementById("container");
   const table = document.createElement("table");
   table.id = "my-grid";
@@ -87,25 +86,138 @@ function createCell(cell_counter) {
   return cell;
 }
 
+function bestMove(pos) {
+  side = possibleMoves(pos)[0];
+  console.log("check size from bestMove " + side);
+  document.getElementById(pos).getElementsByClassName(side)[0].click();
+
+  // clicked and won so called computerMove
+
+  ComputerMove();
+}
+
+function randomMove(box_num) {
+  side = possibleMoves(box_num)[0];
+  document.getElementById(box_num).getElementsByClassName(side)[0].click();
+}
+
+function getAttached(curr_box) {
+  //1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+  up = 0;
+  down = 0;
+  left = 0;
+  right = 0;
+  if (curr_box == 6 || curr_box == 7 || curr_box == 10 || curr_box == 11) {
+    up = curr_box - GridSize;
+    down = curr_box + GridSize;
+    left = curr_box - 1;
+    right = curr_box + 1;
+  } else if (curr_box == 5 || curr_box == 9) {
+    up = curr_box - GridSize;
+    down = curr_box + GridSize;
+    right = curr_box + 1;
+  } else if (curr_box == 1) {
+    down = curr_box + GridSize;
+    right = curr_box + 1;
+  } else if (curr_box == 13) {
+    up = curr_box - GridSize;
+    right = curr_box + 1;
+  } else if (curr_box == 4) {
+    down = curr_box + GridSize;
+    left = curr_box - 1;
+  } else if (curr_box == 2 || curr_box == 3) {
+    down = curr_box + GridSize;
+    left = curr_box - 1;
+    right = curr_box + 1;
+  } else if (curr_box == 3) {
+    down = curr_box + GridSize;
+    left = curr_box - 1;
+    right = curr_box + 1;
+  } else if (curr_box == 8 || curr_box == 12) {
+    up = curr_box - GridSize;
+    down = curr_box + GridSize;
+    left = curr_box - 1;
+  } else if (curr_box == 16) {
+    up = curr_box - GridSize;
+    left = curr_box - 1;
+  } else if (curr_box == 14 || curr_box == 15) {
+    up = curr_box - GridSize;
+    left = curr_box - 1;
+    right = curr_box + 1;
+  }
+
+  ret_list = new Array(up, down, left, right);
+  return ret_list;
+}
+
+//make computer move after
+function ComputerMove() {
+  console.log("player's move registered, about to make computer move");
+
+  for (let i = 1; i <= maxCells * maxCells; i++) {
+    if (gameState[i].filled == 3) {
+      console.log("there were 3 lines available, about to make bestMove");
+      bestMove(i); //called when there is a winning line available
+    }
+  }
+
+  for (let j = 1; j <= maxCells * maxCells; j++) {
+    //j is the curr box
+    if (gameState[j].filled == 1) {
+      console.log("count was 1, making random move in this box");
+      //check for attached boxes, if any of them are 2, continue
+      was_two = 000; //flag to keep track of if neighbours have 2
+      attached = getAttached(j);
+
+      // check all neighbors
+      for (i in attached) {
+        if (i != 0) {
+          if (gameState[i].filled == 2) {
+            was_two = 111;
+            break;
+          }
+        } else {
+          continue;
+        }
+      }
+
+      if (was_two == 111) {
+        continue;
+      } else {
+        randomMove(j);
+        return;
+      }
+    } else {
+      //********** CALL RANDOM MOVE WITH A MATH.RANDOM AVAILABLE SPOT IN BOX NOT FILLED  **************
+      console.log("calling random");
+      const randomIndex = Math.floor(Math.random() * boxNotFilled.length) + 1;
+      randomMove(randomIndex);
+      return;
+    }
+  }
+}
+
 function addOnClick(element, side, id) {
   element.addEventListener("click", function (event) {
     // only update gameState if edge is not already clicked
     if (gameState[id].sides[side] == 0) {
-      console.log("clicked box " + id + "- side " + side);
-      move++;
-      currentPlayer = currentPlayer == 1 ? 2 : 1;
-
-      color = currentPlayer == 1 ? "red" : "blue"; // toggle color
       element.style.setProperty("background-color", color);
 
       gameState[id].sides[side] = 1; // update the side that was actually clicked
       gameState[id].filled++;
 
-      checkedFilled(id, color);
-
+      const filled = checkedFilled(id, color);
       updateSurrounding(id, side, color);
 
-      document.getElementById("currentPlayer").innerHTML = currentPlayer == 1 ? "2" : "1";
+      if (filled != 4) {
+        currentPlayer = currentPlayer == 1 ? "2" : "1";
+        color = currentPlayer == 1 ? "red" : "blue"; // toggle color
+        setTimeout(function () {
+          document.getElementById("currentPlayer").innerHTML = currentPlayer;
+        }, 1000);
+      } else {
+        element.style.setProperty("background-color", color);
+      }
     }
   });
 }
@@ -136,7 +248,7 @@ function updateSurrounding(id, side, color) {
 
     // if we clicked left
   } else if (side == 2) {
-    if ((id - 1) % maxCells >= 0) {
+    if ((id - 1) % maxCells > 0) {
       var newId = id - 1;
       gameState[newId].sides[3] = 1; // force right of the the cell above
       gameState[newId].filled++;
@@ -148,7 +260,7 @@ function updateSurrounding(id, side, color) {
 
     // if we clicked right
   } else {
-    if ((id + 1) % maxCells <= maxCells) {
+    if (id % maxCells != 0) {
       var newId = id + 1;
       gameState[newId].sides[2] = 1; // force left of the the cell to the right
       gameState[newId].filled++;
@@ -163,10 +275,7 @@ function updateSurrounding(id, side, color) {
 function initializeGameState() {
   for (var i = 1; i <= maxCells * maxCells; i++) {
     gameState[i] = { box: i, sides: [0, 0, 0, 0], filled: 0 };
-    // gameState.push({ box: i, sides: [0, 0, 0, 0], filled: 0 });
   }
-
-  console.log(JSON.stringify(gameState, null, 2));
 }
 
 function checkedFilled(id, color) {
@@ -176,29 +285,17 @@ function checkedFilled(id, color) {
     currentPlayer == 1 ? score1++ : score2++;
     document.getElementById(id).style.backgroundColor = color;
   }
+
+  return gameState[id].filled == 4;
 }
 
-function randomizedMove() {
-  const randomIndex = Math.floor(Math.random() * boxNotFilled.length);
-  const pickedBoxId = boxNotFilled[randomIndex];
-  const moves = possibleMoves(gameState[pickedBoxId], pickedBoxId);
-
-  const pickedSide = Math.floor(Math.random() * moves.length);
-
-  console.log("AI picked box " + boxNotFilled[randomIndex] + " - side: " + moves[pickedSide]);
-  document
-    .getElementById(boxNotFilled[randomIndex])
-    .getElementsByClassName(moves[pickedSide].toString())[0]
-    .click();
-}
-
-function possibleMoves(box, id) {
+function possibleMoves(pos) {
   moves = new Array();
-  for (let i = 0; i < 4; i++) {
-    console.log(JSON.stringify(box));
-    if (box.sides[i] == 0) {
+  console.log("pos: " + pos);
+  for (let i = 0; i < 3; i++) {
+    if (gameState[pos].sides[i] == 0) {
       moves.push(i);
     }
   }
-  return moves; // up, down, left, right
+  return moves;
 }
