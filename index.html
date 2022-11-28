@@ -10,10 +10,17 @@
   <body>
     <h1>Dot Box Game</h1>
     <h2>Current Player: <span id="currentPlayer">1</span></h2>
-    <h2>Scores:</h2>
-    <h3>Human: <span id="score1">0</span></h3>
-    <h3>AI: <span id="score2">0</span></h3>
-    <button onclick="ComputerMove()">AI</button>
+
+    <div id="score-board">
+      <span><h2>Scores:</h2></span>
+      Human: <span id="score1">0</span> AI: <span id="score2">0</span>
+    </div>
+
+    <br />
+
+    <!-- <button style="visibility: hidden" id="" onclick="ComputerMove()">AI</button> -->
+
+    <br />
     <div id="container"></div>
     <script src="index.js"></script>
     <!-- <script src="backend.js"></script> -->

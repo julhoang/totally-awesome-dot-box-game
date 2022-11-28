@@ -54,13 +54,14 @@ function formatTable() {
     document.getElementById(i).getElementsByClassName("down")[0].style.display = "None";
   }
 
-  var i = 1;
-  for (var r = 1; r <= maxCells; r++) {
-    for (j = i; j <= maxCells - 1; j++) {
-      document.getElementById(j).getElementsByClassName("right")[0].style.width = "5px";
-      console.log(j);
-    }
-    i += 3;
+  var thin_right = [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15];
+  var thin_left = [2, 3, 4, 6, 7, 8, 10, 11, 12, 14, 15, 16];
+  for (var r = 0; r < thin_right; r++) {
+    document.getElementById(thin_right[r]).getElementsByClassName("right")[0].style.width = "5px";
+  }
+
+  for (var r = 0; r < thin_left; r++) {
+    document.getElementById(thin_left[r]).getElementsByClassName("left")[0].style.width = "0px";
   }
 }
 
@@ -100,10 +101,11 @@ function createCell(cell_counter) {
 function bestMove(pos) {
   side = possibleMoves(pos)[0];
   console.log("check size from bestMove " + side);
-  document.getElementById(pos).getElementsByClassName(side)[0].click();
+  if (side != undefined) {
+    document.getElementById(pos).getElementsByClassName(side)[0].click();
+  }
 
   // clicked and won so called computerMove
-
   ComputerMove();
 }
 
@@ -225,6 +227,10 @@ function addOnClick(element, side, id) {
         color = currentPlayer == 1 ? "red" : "blue"; // toggle color
         setTimeout(function () {
           document.getElementById("currentPlayer").innerHTML = currentPlayer;
+
+          if (currentPlayer == 2) {
+            ComputerMove();
+          }
         }, 1000);
       } else {
         element.style.setProperty("background-color", color);
@@ -311,6 +317,10 @@ function possibleMoves(pos) {
     if (gameState[pos].sides[i] == 0) {
       moves.push(i);
     }
+  }
+
+  if (moves == undefined) {
+    moves = [0, 0, 0, 0];
   }
   return moves;
 }
