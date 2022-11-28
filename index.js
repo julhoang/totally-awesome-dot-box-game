@@ -53,6 +53,15 @@ function formatTable() {
   for (var i = 1; i <= maxCells * maxCells - maxCells; i++) {
     document.getElementById(i).getElementsByClassName("down")[0].style.display = "None";
   }
+
+  var i = 1;
+  for (var r = 1; r <= maxCells; r++) {
+    for (j = i; j <= maxCells - 1; j++) {
+      document.getElementById(j).getElementsByClassName("right")[0].style.width = "5px";
+      console.log(j);
+    }
+    i += 3;
+  }
 }
 
 function createCell(cell_counter) {
@@ -297,6 +306,7 @@ function checkedFilled(id, color) {
 function possibleMoves(pos) {
   moves = new Array();
   console.log("pos: " + pos);
+  console.log(JSON.stringify(gameState[pos].sides));
   for (let i = 0; i < 3; i++) {
     if (gameState[pos].sides[i] == 0) {
       moves.push(i);
